@@ -1,0 +1,42 @@
+#! /bin/bash
+set -e
+
+first_arg=$1
+second_arg=$2
+third_arg=$3
+
+function usage_exit () {
+    printf "usage:\n\n"
+    printf "\tlspools\t\t\t\tlist pools\n"
+    printf "\tfind pool_name\t\t\tfind pgs in a pool\n"
+    exit 1
+}
+
+function find_pool_id () {
+    if [ "$1" == "" ] 
+        then usage_exit
+    fi
+    poolname=$(ceph osd pool stats | grep pool | awk '{print " "$2" "$4}' | grep " $1 " | awk '{print $1}')
+    if [ "$poolname" == "" ]
+        then echo "Pool $1 not found."
+        exit 2
+    else
+        id=$(ceph osd pool stats | grep pool | awk '{print " "$2" "$4}' | grep " $1 " | awk '{print $2}')
+        printf "\e[33mPool: $second_arg\tID: $id\e[0m\n"
+        ceph pg dump pgs_brief | grep ^$id | awk '{print $1 "\t" $3}'
+    fi
+}
+
+
+case $first_arg in
+    lspools)
+        ceph osd pool ls
+        ;;
+    find)
+        find_pool_id $second_arg
+        ;;
+    *)
+        usage_exit
+        ;;
+esac
+

@@ -1,0 +1,10 @@
+#! /bin/bash
+set -e
+
+pid=$$
+
+seq 27 53 > osd.$pid
+
+ceph osd out `cat osd.$pid`
+
+rm osd.$pid

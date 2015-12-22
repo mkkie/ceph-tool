@@ -1,0 +1,7 @@
+#! /bin/bash
+
+for i in mon osd
+do
+ceph tell $i.* injectargs --mon_osd_down_out_interval $1
+done
+

@@ -1,0 +1,17 @@
+#! /bin/bash
+set -e
+
+pid=$$
+
+seq 27 53 > osd.$pid
+
+ceph osd down `cat osd.$pid`
+ceph osd rm `cat osd.$pid`
+
+for i in `cat osd.$pid`
+do
+ceph auth del osd.$i
+ceph osd crush remove osd.$i
+done
+
+rm osd.$pid
